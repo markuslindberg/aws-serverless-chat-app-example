@@ -102,12 +102,13 @@ namespace Cdk
             var allowConnectionManagementOnApiGatewayPolicy = new PolicyStatement(new PolicyStatementProps
             {
                 Effect = Effect.ALLOW,
-                Resources = new [] { $"arn:aws:execute-api:{Region}:{Account}:{webSocketApi.ApiId}/{webSocketStage.StageName}/*" },
-                Actions = new [] { "execute-api:ManageConnections" }
+                Resources = new[] { $"arn:aws:execute-api:{Region}:{Account}:{webSocketApi.ApiId}/{webSocketStage.StageName}/*" },
+                Actions = new[] { "execute-api:ManageConnections" }
             });
 
-            var crossRegionEventRole = new Role(this, "CrossRegionRole", new RoleProps {
-                InlinePolicies = {},
+            var crossRegionEventRole = new Role(this, "CrossRegionRole", new RoleProps
+            {
+                InlinePolicies = { },
                 AssumedBy = new ServicePrincipal("events.amazonaws.com")
             });
 
@@ -124,9 +125,10 @@ namespace Cdk
                 Enabled = true,
                 RuleName = "ProcessChatMessage",
                 Description = "Invokes a Lambda function for each chat message to push the event via websocket and replicates the event to event buses in other regions",
-                EventPattern = new EventPattern {
-                    DetailType = new [] { "ChatMessageReceived" },
-                    Source = new [] { "WebSocketRequestFunction" }
+                EventPattern = new EventPattern
+                {
+                    DetailType = new[] { "ChatMessageReceived" },
+                    Source = new[] { "WebSocketRequestFunction" }
                 },
                 Targets = crossRegionalEventBusTargets.Cast<IRuleTarget>()
                     .Append(new Amazon.CDK.AWS.Events.Targets.LambdaFunction(responseLambda.Fn))
